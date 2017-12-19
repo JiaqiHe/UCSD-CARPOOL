@@ -1,0 +1,100 @@
+<% include ./partials/header %>
+<div class="container">
+    <a class="btn btn-success float-right" href="/posts">Back</a>
+    <h1 class="tocenter togodown">Details</h1>
+</div>
+<div class="container board">
+    <h4>Information</h4>
+    <table class="table">
+        <tbody>
+            <tr>
+                <td class="variable-name">Organizer:</td>
+                <td><%= foundPost.author.username %></td>
+            </tr>
+            <tr>
+                <td class="variable-name">Depart From:</td>
+                <td><%= foundPost.departure %></td>
+            </tr>
+            <tr>
+                <td class="variable-name">Go To:</td>
+                <td><%= foundPost.destination %></td>
+            </tr>
+            <tr>
+                <td class="variable-name">Departure Time:</td>
+                <td><%= foundPost.date %> - <%= foundPost.time_hour %>:<%= foundPost.time_minute %>  <%= foundPost.time_apm %></td>
+            </tr>
+            <tr>
+                <td class="variable-name">Available Slots:</td>
+                <td><%= foundPost.slots %></td>
+            </tr>
+            <tr>
+                <td class="variable-name">Companions:</td>
+                <td>
+                    <% foundPost.companion.forEach(function(c){ %>
+                        <div class="companion-div"><%= c.username %></div>
+                    <% }) %>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+
+    <% if(currentUser && foundPost.author.id.equals(currentUser._id)) { %>
+        <a class="btn btn-warning" href="/posts/<%= foundPost._id %>/edit">Edit</a>
+        <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" class="deleteform">
+            <button class="btn btn-danger">Delete</button>
+        </form>
+    <% } else {%>
+        <a class="btn btn-warning disabled" aria-disabled="true" href="/posts/<%= foundPost._id %>/edit"><i class="fa fa-lock" aria-hidden="true"></i> Edit</a>
+        <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" class="deleteform">
+            <button class="btn btn-danger" disabled><i class="fa fa-lock" aria-hidden="true"></i> Delete</button>
+        </form>
+        <% var hasJoined = false; %>
+        <% foundPost.companion.forEach(function(c){ %>
+        <%    if(c._id.equals(currentUser._id)) hasJoined = true; %>
+        <% }); %>
+        <% if(!hasJoined) { %>
+            <form action="/posts/<%= foundPost._id %>/join?_method=PUT" method="POST" class="float-right">
+                <button class="btn btn-success">Join</button>
+            </form>
+        <% } else { %>
+            <form action="/posts/<%= foundPost._id %>/cancel?_method=PUT" method="POST" class="float-right">
+                <button class="btn btn-danger">Quit</button>
+            </form>
+        <% } %>
+    <% } %>
+</div>
+<div class="container board">
+    <h4>Messages</h4>
+    <hr>
+    <% foundPost.messages.forEach(function(message){ %>
+        <div class="row">
+            <div class="col-md-12">
+                <strong><%= message.author.username %></strong>
+                <span class="float-right">10 minutes ago</span>
+                <p><%= message.text %></p>
+                <% if(currentUser && message.author.id.equals(currentUser._id)) { %>
+                    <a class="btn btn-sm btn-outline-warning" 
+                        href="/posts/<%= foundPost._id%>/comments/<%= message._id %>/edit">
+                        Edit
+                    </a>
+                    <form action="/posts/<%= foundPost._id%>/comments/<%= message._id %>?_method=DELETE" method="POST" class="deleteform">
+                        <input type="submit" class="btn btn-sm btn-outline-danger" value="Delete">
+                    </form>
+                <% } %>
+            </div>
+        </div>
+    <% }); %>
+    
+    <form action="/posts/<%= foundPost._id %>/comments" method="POST">
+        <div class="form-group">
+            <input type="text" class="form-control" name="text" placeholder="text">
+        </div>
+        <div class="form-group">
+            <button class="btn btn-success btn-center">Leave A Message</button>
+        </div>
+    </form>
+</div>
+
+<% include ./partials/footer %>
+

@@ -1,0 +1,78 @@
+<% include ./partials/header %>
+<div class="container">
+    <a class="btn btn-success float-right" href="/posts">Back</a>
+    <h1 class="tocenter">Details</h1>
+</div>
+<div class="container board">
+    <h4>Information</h4>
+    <div class="row">
+        <div class="col-md-12">
+            <p>Organizer: <strong><%= foundPost.author.username %></strong></p>
+        </div>
+        <div class="col-md-12">
+            <p>Depart from: <strong><%= foundPost.departure %></strong></p>
+        </div>
+        <div class="col-md-12">
+            <p>Go to: <strong><%= foundPost.destination %></strong></p>
+        </div>
+        <div class="col-md-12">
+            <p>Departure Time: ??????</p>
+        </div>
+        <div class="col-md-12">
+            <p>Companions: ????????</p>
+        </div>
+    </div>
+    <% if(currentUser && foundPost.author.id.equals(currentUser._id)) { %>
+        <a class="btn btn-warning" href="/posts/<%= foundPost._id %>/edit">Edit</a>
+        <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" id="deleteform">
+            <button class="btn btn-danger">Delete</button>
+        </form>
+    <% } else {%>
+        <a class="btn btn-warning disabled" aria-disabled="true" href="/posts/<%= foundPost._id %>/edit">Edit</a>
+        <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" class="deleteform">
+            <button class="btn btn-danger" disabled>Delete</button>
+        </form>
+    <% } %>
+</div>
+<div class="container board">
+    <h4>Messages</h4>
+    <hr>
+    <% var text = ""; %>
+    <% foundPost.messages.forEach(function(message){ %>
+        <div class="row">
+        <% if(!message._id.equals(comment_id)) { %>
+            <div class="col-md-12">
+                <strong><%= message.author.username %></strong>
+                <span class="float-right">10 minutes ago</span>
+                <p><%= message.text %></p>
+                <% if(currentUser && message.author.id.equals(currentUser._id)) { %>
+                    <a class="btn btn-sm btn-outline-warning" 
+                        href="/posts/<%= foundPost._id%>/comments/<%= message._id %>/edit">
+                        Edit
+                    </a>
+                    <form action="/posts/<%= foundPost._id%>/comments/<%= message._id %>?_method=DELETE" method="POST" class="deleteform">
+                        <input type="submit" class="btn btn-sm btn-outline-danger" value="Delete">
+                    </form>
+                <% } %>
+            </div>
+        <% } else {%>
+        <% text = message.text; %>
+        <% }; %>
+        </div>
+    <% }); %>
+    
+    <form action="/posts/<%= foundPost._id %>/comments/<%= comment_id %>?_method=PUT" method="POST">
+        <div class="form-group">
+            <input type="text" class="form-control" name="text" value="<%= text %>">
+        </div>
+        <!--<div class="form-group">-->
+        <!--    <input type="text" class="form-control" name="message[author]" placeholder="author">-->
+        <!--</div>-->
+        <div class="form-group">
+            <button class="btn btn-success btn-center">Update</button>
+        </div>
+    </form>
+</div>
+
+<% include ./partials/footer %>
+

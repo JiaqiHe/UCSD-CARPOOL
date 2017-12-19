@@ -1,0 +1,71 @@
+<% include partials/header %>
+
+<div class="container">
+    <a href="/posts" class="btn btn-success float-right">back</a>
+    <h1 class="tocenter">Edit Your Schedule</h1>
+    <div class="row">
+        <div class="new-post">
+            <form action="/posts/<%= post._id %>?_method=PUT" method="POST">
+                <div class="form-group">
+                    Depart from: <input class="form-control" type="text" name="newpost[departure]" value="<%= post.departure %>">
+                </div>
+                <div class="form-group">
+                    Go to: <input class="form-control" type="text" name="newpost[destination]" value="<%= post.destination %>">
+                </div>
+                <div class="form-group">
+                    Departure Time: 
+                    <select class="form-control" name="newpost[time_hour]">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                        <option>11</option>
+                        <option>12</option>
+                    </select>
+                    <select class="form-control" name="newpost[time_minute]">
+                        <option>00</option>
+                        <option>05</option>
+                        <option>10</option>
+                        <option>15</option>
+                        <option>20</option>
+                        <option>25</option>
+                        <option>30</option>
+                        <option>35</option>
+                        <option>40</option>
+                        <option>45</option>
+                        <option>50</option>
+                        <option>55</option>
+                    </select>
+                    <select class="form-control" name="newpost[time_apm]">
+                        <option>a.m.</option>
+                        <option>p.m.</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlSelect1">Available Slots: </label>
+                    <select class="form-control" name="newpost[slots]">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-success btn-center">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+  
+</div>
+
+
+
+<% include partials/footer %>

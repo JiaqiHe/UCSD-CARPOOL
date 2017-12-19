@@ -1,0 +1,37 @@
+<% include partials/header %>
+
+<div class="container">
+    <header class="jumbotron background-gray">
+        <h1>Schedules</h1>
+        <p>See other people's schedules and join them!</p>
+        <a class="btn btn-success btn-lg" href="/posts/new">Add New Schedule</a>
+    </header>
+</div>
+
+<div class="container">
+    <table class="table table-hover background-gray">
+        <thead>
+            <tr>
+              <th scope="col">Departure</th>
+              <th scope="col">Destination</th>
+              <th scope="col">Time</th>
+              <th scope="col">Organizer</th>
+              <th scope="col">Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% posts.forEach(function(post){ %>
+                <tr>
+                  <td><%= post.departure %></td>
+                  <td><%= post.destination %></td>
+                  <td><%= post.date %> - <%= post.time_hour %>:<%= post.time_minute %>  <%= post.time_apm %></td>
+                  <td><%= post.author.username%></td>
+                  <td><a href="/posts/<%= post._id %>" class="btn btn-success">Details</a></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+</div>
+
+
+<% include partials/footer %>
