@@ -74,6 +74,14 @@ app.post("/posts", isLoggedIn, function(req, res){
         if(err){
             console.log(err);
         } else {
+            User.findById(req.user._id, function(err, foundUser) {
+                if(err){
+                    req.flash("error", "ERROR!");
+                } else {
+                    foundUser.trips.push(newlyCreated._id);
+                    foundUser.save();
+                }
+            });
             res.redirect("/posts");
         }
     });
@@ -124,6 +132,18 @@ app.delete("/posts/:id", checkPostOwnership, function(req, res){
         if(err){
             res.redirect("/posts");
         } else {
+            User.findById(req.user._id, function(err, foundUser) {
+                if(err){
+                    req.flash("error", "ERROR!");
+                } else {
+                    var newtrips = [];
+                    foundUser.trips.forEach(function(c){
+                        if(!c.equals(req.params.id)) newtrips.push(c);
+                    });
+                    foundUser.trips = newtrips;
+                    foundUser.save();
+                }
+            });
             res.redirect("/posts");
         }
     });
@@ -259,6 +279,14 @@ app.put("/posts/:id/join", isLoggedIn, function(req, res){
                 if (err){
                     req.flash("error", "ERROR!");
                 } else {
+                    User.findById(req.user._id, function(err, foundUser) {
+                        if(err){
+                            req.flash("error", "ERROR!");
+                        } else {
+                            foundUser.trips.push(updatedPost._id);
+                            foundUser.save();
+                        }
+                    });
                     req.flash("success", "You joined this schedule!");
                     res.redirect("/posts/" + req.params.id);
                 }
@@ -279,10 +307,35 @@ app.put("/posts/:id/cancel", isLoggedIn, function(req, res){
                 if(err){
                     req.flash("error", "ERROR!");
                 } else {
+                    User.findById(req.user._id, function(err, foundUser) {
+                        if(err){
+                            req.flash("error", "ERROR!");
+                        } else {
+                            var newtrips = [];
+                            foundUser.trips.forEach(function(c){
+                                if(!c.equals(updatedPost._id)) newtrips.push(c);
+                            });
+                            foundUser.trips = newtrips;
+                            foundUser.save();
+                        }
+                    });
                     req.flash("success", "You cancelled this schedule!");
                     res.redirect("/posts/" + req.params.id);
                 }
             });
+        }
+    });
+});
+
+//=====================
+//       USER PAGE
+//=====================
+app.get("/user/:user_id", isLoggedIn, function(req, res) {
+    User.findById(req.user._id).populate("trips").exec(function(err, foundUser){
+        if(err){
+            res.flash("error", "ERROR!");
+        } else {
+            res.render("profile", {user: foundUser});
         }
     });
 });
