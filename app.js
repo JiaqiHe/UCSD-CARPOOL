@@ -3,16 +3,23 @@ var app           = express();
 var bodyParser     = require("body-parser");
 var mongoose      = require("mongoose");
 var passport      = require("passport");
-var LocalStrategy = require("passport-local");
+var LocalStrategy = require("passport-local").Strategy;
 var methodOverride= require("method-override"); 
 var flash         = require("connect-flash");
+var bcrypt        = require('bcrypt-nodejs');
+var async         = require('async');
+var crypto        = require('crypto');
+// var nodemailer    = require("nodemailer");
+const sgMail      = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 mongoose.connect("mongodb://localhost/carpool", {useMongoClient: true});
 
 var Post          = require("./models/post");
 var Message       = require("./models/message");
-// var seed          = require("./seeds.js");
+var seed          = require("./seeds.js");
 var User          = require("./models/user");
-// seed();
+seed();
 
 app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -28,11 +35,30 @@ app.use(require("express-session")({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-passport.authenticate('local', { failureFlash: 'Invalid username or password.' });
-passport.authenticate('local', { successFlash: 'Welcome back!' });
-passport.use(new LocalStrategy(User.authenticate()));
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+
+passport.use(new LocalStrategy(function(username, password, done) {
+  User.findOne({ username: username }, function(err, user) {
+    if (err) return done(err);
+    if (!user) return done(null, false, { message: 'Incorrect username.' });
+    user.comparePassword(password, function(err, isMatch) {
+      if (isMatch) {
+        return done(null, user);
+      } else {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+    });
+  });
+}));
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
+});
 
 
 //add user info
@@ -236,20 +262,33 @@ app.get("/register", function(req, res) {
     res.render("register");
 });
 
-//handle sign up logic
-app.post("/register", function(req, res) {
-    var newUser = new User({username: req.body.username});
-    User.register(newUser, req.body.password, function(err, user){
-        if(err){
-            req.flash("error", err.message);
-            res.redirect("/register");
-            return;
-        }
-        passport.authenticate("local")(req, res, function(){
-            req.flash("success", "Welcome to UCSD Carpool, " + user.username + "!");
-            res.redirect("/posts");
-        });
+app.post('/register', function(req, res) {
+    if(req.body.password !== req.body.confirm){
+        req.flash("error", "The password you typed in doesn't match!");
+        return res.redirect("/resigter");
+    }
+  var user = new User({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password
     });
+
+  user.save(function(err) {
+      if(err){
+          req.flash("error", "ERROR!");
+          res.redirect("back");
+      } else {
+          req.logIn(user, function(err) {
+              if(err){
+                  req.flash("error", "ERROR!");
+                  res.redirect("back");
+              } else {
+                  req.flash("success", "Welcome to UCSD Carpool, " + user.username + "!");
+                  res.redirect('/posts');
+              }
+          });
+      }
+  });
 });
 
 //show login form
@@ -257,23 +296,137 @@ app.get("/login", function(req, res) {
     res.render("login");
 });
 
-//handle login logic
-app.post("/login", passport.authenticate("local", 
-    {
-        successRedirect:"/posts",
-        failureRedirect:"/login",
-        failureFlash: true
-    }),function(req, res) {
+app.post('/login', function(req, res, next) {
+  passport.authenticate('local', function(err, user, info) {
+    if (err) return next(err)
+    if (!user) {
+        req.flash("error", "Incorrect username or password. Please try again!");
+        res.redirect('/login');
+    } else {
+        req.logIn(user, function(err) {
+            if (err) {
+                console.log(err);
+                return next(err);
+            } else {
+                req.flash("success", "Welcome back, " + user.username + "!");
+                return res.redirect('/posts');
+            }
+        });
+    }
+  })(req, res, next);
 });
-
-
 
 // logout route
 app.get("/logout", function(req, res) {
     req.logout();
     req.flash("success", "Successfully logged you out!")
-    res.redirect("/");
-})
+    res.redirect("/posts");
+});
+
+app.get("/forgot", function(req, res) {
+    res.render("forgot", {user: req.user});
+});
+
+app.post('/forgot', function(req, res, next) {
+  async.waterfall([
+    function(done) {
+      crypto.randomBytes(20, function(err, buf) {
+        var token = buf.toString('hex');
+        done(err, token);
+      });
+    },
+    function(token, done) {
+      User.findOne({ email: req.body.email }, function(err, user) {
+        if (!user) {
+          req.flash('error', 'No account with that email address exists.');
+          return res.redirect('/forgot');
+        }
+
+        user.resetPasswordToken = token;
+        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+        user.save(function(err) {
+          done(err, token, user);
+        });
+      });
+    },
+    function(token, user, done) {
+    const msg = {
+        to: user.email,
+        from: 'ucsdcarpool@gmail.com',
+        subject: 'Reset Password for UCSD CARPOOL',
+        text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
+              'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+              'http://' + req.headers.host + '/reset/' + token + '\n\n' +
+              'If you did not request this, please ignore this email and your password will remain unchanged.\n'
+    };
+    sgMail.send(msg, function(err){
+        if(err){
+            req.flash("error", "ERROR!");
+        } else {
+            req.flash('success', 'An e-mail has been sent to your mailbox with further instructions. [IMPORTANT: This e-mail may be filtered into Junk mailbox.]');
+            res.redirect("/forgot");
+        }
+    });
+    }
+  ], function(err) {
+    if (err) return next(err);
+    res.redirect('/forgot');
+  });
+});
+
+app.get('/reset/:token', function(req, res) {
+    User.findOne({ resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now() } }, function(err, user) {
+        if(err){
+            req.flash("error", "ERROR!");
+            res.redirect("/forgot");
+        } else {
+            if (!user) {
+                console.log(user);
+                req.flash('error', 'Password reset token is invalid or has expired.');
+                return res.redirect('/forgot');
+            }
+            res.render('reset', {user: req.user, token: req.params.token});
+        }
+    });
+});
+
+app.post('/reset/:token', function(req, res) {
+    if(req.body.password !== req.body.confirm){
+        req.flash("error", "The password you typed in doesn't match!");
+        return res.redirect("back");
+    }
+    User.findOne({resetPasswordToken: req.params.token, resetPasswordExpires: { $gt: Date.now()}}, function(err, user){
+        if(err){
+            req.flash("error", "ERROR!");
+            res.redirect("/forgot");
+        } else {
+            if(!user){
+                req.flash('error', 'Password reset token is invalid or has expired.');
+                return res.redirect('/forgot');
+            } else {
+                user.password = req.body.password;
+                user.resetPasswordToken = undefined;
+                user.resetPasswordExpires = undefined;
+                user.save(function(err){
+                    if(err){
+                        req.flash("error", "Failure to change password. Try again.");
+                        return res.redirect("/forgot");
+                    } 
+                    req.logIn(user, function(err){
+                        if(err){
+                            req.flash("success", "You have successfully changed your password!");
+                            res.redirect("/login");
+                        } else {
+                            req.flash("success", "You have successfully changed your password!");
+                            res.redirect("/posts");
+                        }
+                    })
+                })
+            }
+        }
+    });
+});
 
 //=====================
 //        JOIN

@@ -1,13 +1,11 @@
 <% include ./partials/header %>
 
-<h1>Sign Up</h1>
+<h1>Reset Your Password</h1>
 
-<form action="/register" method="POST">
-    <input type="text" name="username" placeholder="username">
-    <input type="text" name="email" placeholder="email">
+<form action="/reset/<%= token %>" method="POST">
     <input type="password" name="password" placeholder="password">
     <input type="password" name="confirm" placeholder="confirm password">
-    <button>Sign Up</button>
+    <button type="submit">Reset</button>
 </form>
 
 <% include ./partials/footer %>
