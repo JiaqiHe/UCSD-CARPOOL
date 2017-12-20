@@ -38,12 +38,24 @@
         </tbody>
     </table>
     <hr>
-
+    <% var d = new Date(); %>
+    <% var cur = d.getTime(); %>
+    <% var schedule_time = Date.parse(foundPost.date) + (Number(foundPost.time_hour)-1)*3600*1000 + Number(foundPost.time_minute)*60*1000; %>
+    <% if(foundPost.time_apm === "p.m.") schedule_time = schedule_time + 12*3600*1000; %>
+    <% var timeAllowed = schedule_time - cur > 600 * 1000; %>
     <% if(currentUser && foundPost.author.id.equals(currentUser._id)) { %>
-        <a class="btn btn-sm btn-warning btn-width edit-button" href="/posts/<%= foundPost._id %>/edit">Edit</a>
-        <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" class="deleteform">
-            <button class="btn btn-sm btn-danger btn-width">Delete</button>
-        </form>
+        <% if(timeAllowed) { %>
+            <a class="btn btn-sm btn-warning btn-width edit-button" href="/posts/<%= foundPost._id %>/edit">Edit</a>
+            <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" class="deleteform">
+                <button class="btn btn-sm btn-danger btn-width">Delete</button>
+            </form>
+        <% } else {%>
+            <a class="btn btn-sm btn-warning disabled btn-width edit-button" aria-disabled="true" href="/posts/<%= foundPost._id %>/edit"><i class="fa fa-lock" aria-hidden="true"></i> Edit</a>
+            <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" class="deleteform">
+                <button class="btn btn-sm btn-danger btn-width" disabled><i class="fa fa-lock" aria-hidden="true"></i> Delete</button>
+            </form>
+            <p>*Sorry, you cannot edit or delete your posted schedule in less than 10 minutes before departure.</p>
+        <% } %>
     <% } else {%>
         <a class="btn btn-sm btn-warning disabled btn-width edit-button" aria-disabled="true" href="/posts/<%= foundPost._id %>/edit"><i class="fa fa-lock" aria-hidden="true"></i> Edit</a>
         <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" class="deleteform">
@@ -54,13 +66,25 @@
         <%    if(c._id.equals(currentUser._id)) hasJoined = true; %>
         <% }); %>
         <% if(!hasJoined) { %>
-            <form action="/posts/<%= foundPost._id %>/join?_method=PUT" method="POST" class="deleteform">
-                <button class="btn btn-sm btn-success btn-width">Join</button>
-            </form>
+            <% if(timeAllowed) { %>
+                <form action="/posts/<%= foundPost._id %>/join?_method=PUT" method="POST" class="deleteform">
+                    <button class="btn btn-sm btn-success btn-width">Join</button>
+                </form>
+            <% } else { %>
+                <form action="/posts/<%= foundPost._id %>/join?_method=PUT" method="POST" class="deleteform">
+                    <button class="btn btn-sm btn-success btn-width" disabled><i class="fa fa-lock" aria-hidden="true"></i> Join</button>
+                </form>
+            <% } %>
         <% } else { %>
-            <form action="/posts/<%= foundPost._id %>/cancel?_method=PUT" method="POST" class="deleteform">
-                <button class="btn btn-sm btn-danger btn-width">Quit</button>
-            </form>
+            <% if(timeAllowed) { %>
+                <form action="/posts/<%= foundPost._id %>/cancel?_method=PUT" method="POST" class="deleteform">
+                    <button class="btn btn-sm btn-danger btn-width">Quit</button>
+                </form>
+            <% } else { %>
+                <form action="/posts/<%= foundPost._id %>/cancel?_method=PUT" method="POST" class="deleteform">
+                    <button class="btn btn-sm btn-danger btn-width" disabled><i class="fa fa-lock" aria-hidden="true"></i> Quit</button>
+                </form>
+            <% } %>
         <% } %>
     <% } %>
 </div>
