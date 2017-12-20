@@ -5,14 +5,15 @@ body {
     background-repeat: no-repeat;
 }
 .board {
-    background-color: rgba(255,255,255,0.78);
+    background-color: rgba(240,245,214,0.78);
     margin: 20px auto;
     padding-bottom: 10px;
-    width: 60%;
+    width: 50%;
+    min-width: 300px;
 }
 
 .background-gray {
-    background: rgba(255,255,255,0.78);
+    background: rgba(240,245,214,0.78);
 }
 .tocenter {
     text-align: center;
@@ -47,18 +48,16 @@ body {
 }
 
 .new-post {
-    width: 40%;
-    min-width: 320px;
+    width: 50%;
+    min-width: 300px;
     margin: 20px auto;
-    background-color: rgba(255,255,255,0.78);
+    background-color: rgba(240,245,214,0.78);
     padding-bottom: 10px;
     padding-left: 10px;
     padding-right: 10px;
 }
 
-.deleteform {
-    display: inline;
-}
+
 
 .companion-div {
     float: left;
@@ -71,4 +70,21 @@ body {
 
 .alert-godown {
     margin-top: 1%;
+}
+
+.edit-button {
+    margin-left: 15%;
+}
+
+.deleteform {
+    display: inline;
+    margin-left: 5%;
+}
+
+.message-button {
+    padding: 0;
+}
+
+.btn-width {
+    width: 20%;
 }

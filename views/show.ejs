@@ -40,26 +40,26 @@
     <hr>
 
     <% if(currentUser && foundPost.author.id.equals(currentUser._id)) { %>
-        <a class="btn btn-warning" href="/posts/<%= foundPost._id %>/edit">Edit</a>
+        <a class="btn btn-sm btn-warning btn-width edit-button" href="/posts/<%= foundPost._id %>/edit">Edit</a>
         <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" class="deleteform">
-            <button class="btn btn-danger">Delete</button>
+            <button class="btn btn-sm btn-danger btn-width">Delete</button>
         </form>
     <% } else {%>
-        <a class="btn btn-warning disabled" aria-disabled="true" href="/posts/<%= foundPost._id %>/edit"><i class="fa fa-lock" aria-hidden="true"></i> Edit</a>
+        <a class="btn btn-sm btn-warning disabled btn-width edit-button" aria-disabled="true" href="/posts/<%= foundPost._id %>/edit"><i class="fa fa-lock" aria-hidden="true"></i> Edit</a>
         <form action="/posts/<%= foundPost._id %>?_method=DELETE" method="POST" class="deleteform">
-            <button class="btn btn-danger" disabled><i class="fa fa-lock" aria-hidden="true"></i> Delete</button>
+            <button class="btn btn-sm btn-danger btn-width" disabled><i class="fa fa-lock" aria-hidden="true"></i> Delete</button>
         </form>
         <% var hasJoined = false; %>
         <% foundPost.companion.forEach(function(c){ %>
         <%    if(c._id.equals(currentUser._id)) hasJoined = true; %>
         <% }); %>
         <% if(!hasJoined) { %>
-            <form action="/posts/<%= foundPost._id %>/join?_method=PUT" method="POST" class="float-right">
-                <button class="btn btn-success">Join</button>
+            <form action="/posts/<%= foundPost._id %>/join?_method=PUT" method="POST" class="deleteform">
+                <button class="btn btn-sm btn-success btn-width">Join</button>
             </form>
         <% } else { %>
-            <form action="/posts/<%= foundPost._id %>/cancel?_method=PUT" method="POST" class="float-right">
-                <button class="btn btn-danger">Quit</button>
+            <form action="/posts/<%= foundPost._id %>/cancel?_method=PUT" method="POST" class="deleteform">
+                <button class="btn btn-sm btn-danger btn-width">Quit</button>
             </form>
         <% } %>
     <% } %>
@@ -71,16 +71,28 @@
         <div class="row">
             <div class="col-md-12">
                 <strong><%= message.author.username %></strong>
-                <span class="float-right">10 minutes ago</span>
+                <% var d = new Date(); %>
+                <% var t = (d.getTime() - message.time.getTime())/1000; %>
+                <% if(t<60) { %>
+                    <span class="float-right"><%= Math.round(t) %> seconds ago</span>
+                <% } else if(t<3600) { %>
+                    <span class="float-right"><%= Math.round(t/60) %> minutes ago</span>
+                <% } else if(t<3600*24) { %>
+                    <span class="float-right"><%= Math.round(t/3600) %> hours ago</span>
+                <% } else { %>
+                    <span class="float-right"><%= message.time.getMonth() %>/<%= message.time.getDate() %>/<%= message.time.getFullYear() %></span>
+                <% } %>
                 <p><%= message.text %></p>
                 <% if(currentUser && message.author.id.equals(currentUser._id)) { %>
-                    <a class="btn btn-sm btn-outline-warning" 
+                <!--<div class="container col-md-4 float-right message-button">-->
+                    <a class="btn btn-sm btn-warning btn-width edit-button" 
                         href="/posts/<%= foundPost._id%>/comments/<%= message._id %>/edit">
                         Edit
                     </a>
                     <form action="/posts/<%= foundPost._id%>/comments/<%= message._id %>?_method=DELETE" method="POST" class="deleteform">
-                        <input type="submit" class="btn btn-sm btn-outline-danger" value="Delete">
+                        <input type="submit" class="btn btn-sm btn-danger deleteform btn-width" value="Delete">
                     </form>
+                <!--</div>-->
                 <% } %>
             </div>
         </div>

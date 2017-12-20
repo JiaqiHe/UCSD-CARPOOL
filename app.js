@@ -160,12 +160,14 @@ app.post("/posts/:id/comments", function(req, res){
             req.flash("error", "Error!");
             res.redirect("/posts");
         } else {
+            var d = new Date();
             var newmessage = {
                 text: req.body.text,
                 author: {
                     id: req.user._id,
                     username: req.user.username
-                }
+                },
+                time: d
             };
             Message.create(newmessage, function(err, message){
                 if(err){
@@ -197,6 +199,8 @@ app.put("/posts/:id/comments/:comment_id", checkMessageOwnership, function(req, 
         if (err) {
             res.redirect("/posts");
         } else {
+            var d = new Date();
+            updated.time = d;
             updated.text = req.body.text;
             updated.save(function(err, updatedMessage){
                 if (err){
@@ -214,7 +218,7 @@ app.delete("/posts/:id/comments/:comment_id", checkMessageOwnership, function(re
         if(err){
             res.redirect("back");
         } else {
-            res.flash("success", "Message deleted!");
+            req.flash("success", "Message deleted!");
             res.redirect("/posts/" + req.params.id);
         }
     });

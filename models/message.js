@@ -8,7 +8,8 @@ var messageSchema = mongoose.Schema({
             ref: "User"
         },
         username: String
-    }
+    },
+    time: Date
 });
 
 module.exports = mongoose.model("Message", messageSchema);
