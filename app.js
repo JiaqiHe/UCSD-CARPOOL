@@ -13,8 +13,9 @@ var nodemailer    = require("nodemailer");
 const sgMail      = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+var url = process.env.DATABASEURL || "mongodb://localhost/carpool";
 // mongoose.connect("mongodb://localhost/carpool", {useMongoClient: true});
-mongoose.connect(process.env.DATABASEURL);
+mongoose.connect(url);
 
 
 var Post          = require("./models/post");
@@ -238,6 +239,7 @@ app.delete("/posts/:id", checkPostOwnership, function(req, res){
                     foundUser.trips = newtrips;
                     foundUser.save();
                     Message.remove({post: req.params.id});
+                    Notification.remove({post: req.params.id});
                 }
             });
             res.redirect("/posts");
@@ -435,7 +437,7 @@ app.post('/forgot', function(req, res, next) {
     sgMail.send(msg, function(err){
         if(err){
             console.log(err);
-            req.flash("error", "ERROR!");
+            req.flash("error", "OOPS! ERROR! TRY AGAIN!");
             return res.redirect("back");
         } else {
             req.flash('success', 'An e-mail has been sent to your mailbox with further instructions. [IMPORTANT: This e-mail may be filtered into Junk mailbox.]');
