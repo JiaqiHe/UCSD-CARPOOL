@@ -9,10 +9,10 @@ var flash         = require("connect-flash");
 var bcrypt        = require('bcrypt-nodejs');
 var async         = require('async');
 var crypto        = require('crypto');
+var nodemailer    = require("nodemailer");
 const sgMail      = require('@sendgrid/mail');
-// var nodemailer    = require("nodemailer");
-
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 mongoose.connect("mongodb://localhost/carpool", {useMongoClient: true});
 
 var Post          = require("./models/post");
@@ -415,7 +415,9 @@ app.post('/forgot', function(req, res, next) {
     };
     sgMail.send(msg, function(err){
         if(err){
+            console.log(err);
             req.flash("error", "ERROR!");
+            return res.redirect("back");
         } else {
             req.flash('success', 'An e-mail has been sent to your mailbox with further instructions. [IMPORTANT: This e-mail may be filtered into Junk mailbox.]');
             res.redirect("/forgot");
@@ -702,6 +704,30 @@ function updateEmail(){
         }
     });
 }
+
+//=======================
+//    NOTIFICATION
+//=======================
+var TIME_INTERVAL_IN_MILLIS = 60000*10; //10 minutes
+
+var runMe = function() {
+    //go over notification database
+    //=============================
+    //  TO BE WRITTEN
+    //=============================
+    var now = new Date().getTime();
+    setTimeout(runMe, getNextMinute(now));
+}
+
+
+var getNextMinute = function(now) {
+  var timePassed = now % TIME_INTERVAL_IN_MILLIS;
+  return TIME_INTERVAL_IN_MILLIS - timePassed;
+}
+
+runMe();
+
+
 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("the carpool server has started");
