@@ -13,7 +13,9 @@ var nodemailer    = require("nodemailer");
 const sgMail      = require('@sendgrid/mail');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
-mongoose.connect("mongodb://localhost/carpool", {useMongoClient: true});
+// mongoose.connect("mongodb://localhost/carpool", {useMongoClient: true});
+mongoose.connect("mongodb://JiaqiHe:1735794a75b@ds163156.mlab.com:63156/ucsdcarpool");
+
 
 var Post          = require("./models/post");
 var Message       = require("./models/message");
