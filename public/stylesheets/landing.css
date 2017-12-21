@@ -2,7 +2,8 @@
   z-index: 1;
   position: relative;
   text-align: center;
-  padding-top: 40vh;
+  margin-top: 30vh;
+  background-color: rgba(240,245,214,0.78);
 }
 
 .slideshow { 
@@ -74,5 +75,12 @@
 }
 
 #welcome {
-  font-size: 2.5em;
+  font-family: Titillium Web;
+  font-size: 60px;
+}
+
+#caption {
+  font-family: Open Sans;
+  font-size: 18px;
+  
 }

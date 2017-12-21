@@ -21,13 +21,17 @@
         </thead>
         <tbody>
             <% posts.forEach(function(post){ %>
-                <tr>
-                  <td><%= post.departure %></td>
-                  <td><%= post.destination %></td>
-                  <td><%= post.date %> - <%= post.time_hour %>:<%= post.time_minute %>  <%= post.time_apm %></td>
-                  <td><%= post.author.username%></td>
-                  <td><a href="/posts/<%= post._id %>" class="btn btn-success">Details</a></td>
-                </tr>
+                <% var d = new Date(); %>
+                <% var cur = d.getTime(); %>
+                <% if(post.schedule_time > cur) { %>
+                    <tr>
+                      <td><%= post.departure %></td>
+                      <td><%= post.destination %></td>
+                      <td><%= post.date %> - <%= post.time_hour %>:<%= post.time_minute %>  <%= post.time_apm %></td>
+                      <td><%= post.author.username%></td>
+                      <td><a href="/posts/<%= post._id %>" class="btn btn-success">Details</a></td>
+                    </tr>
+                <% }; %>
             <% }); %>
         </tbody>
     </table>

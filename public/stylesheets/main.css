@@ -4,7 +4,27 @@ body {
     background-position: center;
     background-repeat: no-repeat;
 }
+.loginboard {
+    background-color: rgba(240,245,214,0.78);
+    margin: 20px auto;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    width: 50%;
+    min-width: 300px;
+    font-family: Questrial;
+}
+
 .board {
+    background-color: rgba(240,245,214,0.78);
+    margin: 20px auto;
+    padding-top: 10px;
+    padding-bottom: 20px;
+    width: 50%;
+    min-width: 300px;
+    font-family: Questrial;
+}
+
+.databoard {
     background-color: rgba(240,245,214,0.78);
     margin: 20px auto;
     padding-top: 10px;
@@ -28,11 +48,6 @@ body {
 }
 .jumbotron {
     margin: 30px auto;
-}
-
-.time {
-    float: right;
-    /*width: 33%;*/
 }
 
 .time-slot {
@@ -94,6 +109,6 @@ body {
 }
 
 .data {
-    font-family: Yeseva One;
+    /*font-family: Yeseva One;*/
     font-size: 200%;
 }

@@ -19,8 +19,8 @@ var Post          = require("./models/post");
 var Message       = require("./models/message");
 var User          = require("./models/user");
 var Data          = require("./models/data");
-// var seed          = require("./seeds.js");
-// seed();
+var seed          = require("./seeds.js");
+seed();
 
 app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -128,7 +128,6 @@ app.get("/posts", function(req,res){
 
 //CREATE - ADD A NEW POST
 app.post("/posts", isLoggedIn, function(req, res){
-    addPost();
     //save to DB
     var thisauthor = {
         id: req.user._id,
@@ -136,6 +135,17 @@ app.post("/posts", isLoggedIn, function(req, res){
     };
     var newpost = req.body.newpost;
     newpost["author"] = thisauthor;
+    var timezone = Number(newpost.timezone[6]);
+    var schedule_time = Date.parse(newpost.date) + (Number(newpost.time_hour) + timezone)*3600*1000 + Number(newpost.time_minute)*60*1000;
+    if(newpost.time_apm === "p.m.") schedule_time = schedule_time + 12*3600*1000;
+    newpost["schedule_time"] = schedule_time;
+    var d = new Date();
+    var cur = d.getTime();
+    if(cur > schedule_time){
+        req.flash("error", "Your departure time cannot be set in the past.");
+        return res.redirect("back");
+    }
+    addPost();
     Post.create(newpost, function(err, newlyCreated){
         if(err){
             console.log(err);
