@@ -19,6 +19,7 @@ var Post          = require("./models/post");
 var Message       = require("./models/message");
 var User          = require("./models/user");
 var Data          = require("./models/data");
+var Notification  = require("./models/notification");
 var seed          = require("./seeds.js");
 seed();
 
@@ -156,8 +157,15 @@ app.post("/posts", isLoggedIn, function(req, res){
                 } else {
                     foundUser.trips.push(newlyCreated._id);
                     foundUser.save();
+                    Notification.create({
+                        email: foundUser.email, 
+                        time: schedule_time - 3600*1000, 
+                        post: newlyCreated._id, 
+                        hassent: false
+                    });
                 }
             });
+            
             res.redirect("/posts");
         }
     });
@@ -198,6 +206,13 @@ app.put("/posts/:id", checkPostOwnership, function(req, res){
         if(err){
             res.redirect("/posts");
         } else {
+                var timezone = Number(updated.timezone[6]);
+                var schedule_time = Date.parse(updated.date) + (Number(updated.time_hour) + timezone)*3600*1000 + Number(updated.time_minute)*60*1000;
+                if(updated.time_apm === "p.m.") schedule_time = schedule_time + 12*3600*1000;
+                updated.schedule_time = schedule_time;
+                updated.save();
+                console.log(updated.schedule_time);
+                Notification.update({post:updated._id}, {$set: {time: schedule_time - 3600*1000}});
             res.redirect("/posts/" + req.params.id);
         }
     });
@@ -503,6 +518,12 @@ app.put("/posts/:id/join", isLoggedIn, function(req, res){
                         } else {
                             foundUser.trips.push(updatedPost._id);
                             foundUser.save();
+                            Notification.create({
+                                email: foundUser.email, 
+                                time: updatedPost.schedule_time - 3600*1000, 
+                                post: updatedPost._id, 
+                                hassent: false
+                            });
                         }
                     });
                     req.flash("success", "You joined this schedule!");
@@ -535,6 +556,11 @@ app.put("/posts/:id/cancel", isLoggedIn, function(req, res){
                             });
                             foundUser.trips = newtrips;
                             foundUser.save();
+                            Notification.remove({
+                                email: foundUser.email, 
+                                time: updatedPost.schedule_time - 3600*1000, 
+                                post: updatedPost._id
+                            });
                         }
                     });
                     req.flash("success", "You cancelled this schedule!");
@@ -705,29 +731,57 @@ function updateEmail(){
     });
 }
 
+function sendnotification(email, post){
+    const msg = {
+        to: email,
+        from: 'ucsdcarpool@gmail.com',
+        subject: 'Less Than An Hour Before Departure',
+        text: 'Get Ready for your schedule: ' + post.departure + ' - ' + post.destination 
+        + ' on ' + post.date + ' at ' + post.time_hour + ':' + post.time_minute + ' ' + post.time_apm + '! \n\n' +
+        'You have less than an hour before departure!\n\n'
+    };
+    sgMail.send(msg);
+    updateEmail();
+}
 //=======================
 //    NOTIFICATION
 //=======================
 var TIME_INTERVAL_IN_MILLIS = 60000*10; //10 minutes
 
-var runMe = function() {
+var reminder = function() {
     //go over notification database
-    //=============================
-    //  TO BE WRITTEN
-    //=============================
-    var now = new Date().getTime();
-    setTimeout(runMe, getNextMinute(now));
+    var now = new Date().getTime() - 3600*1000;
+    Notification.find({
+        time:{$gt: now}
+    }, function(err, tosend){
+        if(err){
+            console.log(err);
+        } else {
+            if(!tosend){
+                    tosend.forEach(function(task){
+                    Post.findById(task.post, function(err, foundPost) {
+                        if(err){
+                            console.log(err);
+                        } else {
+                            sendnotification(task.email, foundPost);
+                            task.hassent = true;
+                            task.save();
+                        }
+                    })
+                    Notification.remove({hassent: true});
+                })
+            }
+        }
+    });
+    setTimeout(reminder, getNextMinute(now));
 }
-
 
 var getNextMinute = function(now) {
   var timePassed = now % TIME_INTERVAL_IN_MILLIS;
   return TIME_INTERVAL_IN_MILLIS - timePassed;
 }
 
-runMe();
-
-
+reminder();
 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("the carpool server has started");
