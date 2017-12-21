@@ -20,8 +20,8 @@ var Message       = require("./models/message");
 var User          = require("./models/user");
 var Data          = require("./models/data");
 var Notification  = require("./models/notification");
-var seed          = require("./seeds.js");
-seed();
+// var seed          = require("./seeds.js");
+// seed();
 
 app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({extended: true}));
