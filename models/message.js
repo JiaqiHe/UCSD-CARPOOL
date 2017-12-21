@@ -9,7 +9,11 @@ var messageSchema = mongoose.Schema({
         },
         username: String
     },
-    time: Date
+    time: Date,
+    post: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Post"
+    }
 });
 
 module.exports = mongoose.model("Message", messageSchema);

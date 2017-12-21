@@ -237,6 +237,7 @@ app.delete("/posts/:id", checkPostOwnership, function(req, res){
                     });
                     foundUser.trips = newtrips;
                     foundUser.save();
+                    Message.remove({post: req.params.id});
                 }
             });
             res.redirect("/posts");
@@ -263,7 +264,8 @@ app.post("/posts/:id/comments", function(req, res){
                     id: req.user._id,
                     username: req.user.username
                 },
-                time: d
+                time: d,
+                post: req.params.id
             };
             Message.create(newmessage, function(err, message){
                 if(err){
