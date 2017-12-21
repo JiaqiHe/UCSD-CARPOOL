@@ -1,10 +1,17 @@
 <% include ./partials/header %>
 
-<h1>Forgot Password</h1>
-
-<form action="/forgot" method="POST">
-    <input type="text" name="email" placeholder="email">
-    <button type="submit">Reset Password</button>
-</form>
+<h1 class="tocenter">Forgot Password</h1>
+<div class="container board">
+    <form action="/forgot" method="POST">
+        <div class="form-group">
+            <label>E-mail:</label>
+            <input type="email" class="form-control" name="email" aria-describedby="emailHelp" placeholder="E-mail">
+        </div>
+        <button class="btn btn-success btn-center" type="submit">Reset Password</button>
+        <div class="form-group">
+            <a href="/login" class="btn float-right">Go back and login</a>
+        </div>
+    </form>
+</div>
 
 <% include ./partials/footer %>

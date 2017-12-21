@@ -9,17 +9,17 @@ var flash         = require("connect-flash");
 var bcrypt        = require('bcrypt-nodejs');
 var async         = require('async');
 var crypto        = require('crypto');
-// var nodemailer    = require("nodemailer");
 const sgMail      = require('@sendgrid/mail');
+// var nodemailer    = require("nodemailer");
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 mongoose.connect("mongodb://localhost/carpool", {useMongoClient: true});
 
 var Post          = require("./models/post");
 var Message       = require("./models/message");
-var seed          = require("./seeds.js");
 var User          = require("./models/user");
-seed();
+// var seed          = require("./seeds.js");
+// seed();
 
 app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({extended: true}));

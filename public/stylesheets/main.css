@@ -1,13 +1,14 @@
 body {
     background-image: url("https://images.unsplash.com/photo-1504541891213-1b1dfdadb739?auto=format&fit=crop&w=750&q=80&ixid=dW5zcGxhc2guY29tOzs7Ozs%3D");
     background-size: cover;
-    background-position: 50% 50%;
+    background-position: center;
     background-repeat: no-repeat;
 }
 .board {
     background-color: rgba(240,245,214,0.78);
     margin: 20px auto;
-    padding-bottom: 10px;
+    padding-top: 10px;
+    padding-bottom: 20px;
     width: 50%;
     min-width: 300px;
 }
@@ -17,6 +18,7 @@ body {
 }
 .tocenter {
     text-align: center;
+    margin-top: 5%;
 }
 
 .togodown {
