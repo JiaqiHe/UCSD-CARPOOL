@@ -5,7 +5,8 @@ var dataSchema = mongoose.Schema({
     webpage_visit: Number,
     user: Number,
     post: Number,
-    message: Number
+    message: Number,
+    email: Number
 });
 
 module.exports = mongoose.model("Data", dataSchema);

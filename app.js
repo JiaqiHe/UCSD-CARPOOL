@@ -18,6 +18,7 @@ mongoose.connect("mongodb://localhost/carpool", {useMongoClient: true});
 var Post          = require("./models/post");
 var Message       = require("./models/message");
 var User          = require("./models/user");
+var Data          = require("./models/data");
 // var seed          = require("./seeds.js");
 // seed();
 
@@ -69,8 +70,42 @@ app.use(function(req, res, next){
     next();
 });
 
+Data.findOne({name: "data"}, function(err, data) {
+    if(err){
+        console.log(err);
+    } else {
+        if(!data){
+            var d = {
+                name: "data",
+                webpage_visit: 0,
+                user: 0,
+                post: 0,
+                message: 0,
+                email: 0
+            };
+            Data.create(d);
+        }
+    }
+});
+
+User.findOne({username: "admin"}, function(err, admin) {
+    if(err){
+        console.log(err);
+    } else {
+        if(!admin){
+            var ad = {
+                username: "admin",
+                password: "admin",
+                email: "admin@test.com"
+            }
+            User.create(ad);
+        }
+    }
+});
+
 //LANDING PAGE
 app.get("/", function(req,res){
+    updateVisit();
     res.render("landing.ejs");
 });
 
@@ -80,6 +115,7 @@ app.get("/", function(req,res){
 
 //INDEX - DISPLAY ALL POSTS
 app.get("/posts", function(req,res){
+    updateVisit();
     //get all posts from DB
     Post.find({}, function(err, allposts){
         if(err){
@@ -92,6 +128,7 @@ app.get("/posts", function(req,res){
 
 //CREATE - ADD A NEW POST
 app.post("/posts", isLoggedIn, function(req, res){
+    addPost();
     //save to DB
     var thisauthor = {
         id: req.user._id,
@@ -123,6 +160,7 @@ app.get("/posts/new", isLoggedIn, function(req, res) {
 
 //SHOW - DISPLAY DETAILED INFO OF A POST
 app.get("/posts/:id", isLoggedIn ,function(req, res){
+    updateVisit();
     Post.findById(req.params.id).populate("messages").populate("companion").exec(function(err, foundPost){
         if(err){
             console.log(err);
@@ -157,6 +195,7 @@ app.put("/posts/:id", checkPostOwnership, function(req, res){
 
 //DESTROY - DELETE POST
 app.delete("/posts/:id", checkPostOwnership, function(req, res){
+    subtractPost();
     Post.findByIdAndRemove(req.params.id, function(err){
         if(err){
             res.redirect("/posts");
@@ -183,6 +222,7 @@ app.delete("/posts/:id", checkPostOwnership, function(req, res){
 //===================
 
 app.post("/posts/:id/comments", function(req, res){
+    addMessage();
     //lookup post using id
     Post.findById(req.params.id, function(err, post){
         if(err){
@@ -243,6 +283,7 @@ app.put("/posts/:id/comments/:comment_id", checkMessageOwnership, function(req, 
 });
 
 app.delete("/posts/:id/comments/:comment_id", checkMessageOwnership, function(req, res){
+    subtractMessage();
     Message.findByIdAndRemove(req.params.comment_id, function(err){
         if(err){
             res.redirect("back");
@@ -267,6 +308,7 @@ app.post('/register', function(req, res) {
         req.flash("error", "The password you typed in doesn't match!");
         return res.redirect("/resigter");
     }
+    updateUser();
   var user = new User({
       username: req.body.username,
       email: req.body.email,
@@ -351,6 +393,7 @@ app.post('/forgot', function(req, res, next) {
       });
     },
     function(token, user, done) {
+        updateEmail();
     const msg = {
         to: user.email,
         from: 'ucsdcarpool@gmail.com',
@@ -494,12 +537,22 @@ app.put("/posts/:id/cancel", isLoggedIn, function(req, res){
 //       USER PAGE
 //=====================
 app.get("/user/:user_id", isLoggedIn, function(req, res) {
+    updateVisit();
     User.findById(req.user._id).populate("trips").exec(function(err, foundUser){
         if(err){
             res.flash("error", "ERROR!");
         } else {
             res.render("profile", {user: foundUser});
         }
+    });
+});
+
+//=====================
+//        DATA
+//=====================
+app.get("/data", isAdmin, function(req, res) {
+    Data.findOne({name: "data"}, function(err, data) {
+        res.render("data", {data: data});
     });
 });
 
@@ -512,6 +565,14 @@ function isLoggedIn(req, res, next){
     }
     req.flash("error", "You need to Login first. Please Login!");
     res.redirect("/login");
+}
+
+function isAdmin(req, res, next){
+    if(req.user.username === "admin"){
+        return next();
+    }
+    req.flash("error", "Sorry, you don't have permission to visit this page.");
+    res.redirect("/posts");
 }
 
 function checkPostOwnership(req, res, next){
@@ -553,6 +614,83 @@ function checkMessageOwnership(req, res, next){
         req.flash("error", "You need to Login first. Please Login!");
         res.redirect("back");
     }
+}
+
+function updateVisit(){
+    Data.findOne({name: "data"}, function(err, data) {
+        if(err){
+            console.log(err);
+        } else {
+            data.webpage_visit = data.webpage_visit + 1;
+            data.save();
+        }
+    });
+}
+
+function updateUser(){
+    Data.findOne({name: "data"}, function(err, data) {
+        if(err){
+            console.log(err);
+        } else {
+            data.user = data.user + 1;
+            data.save();
+        }
+    });
+}
+
+function addPost(){
+    Data.findOne({name: "data"}, function(err, data) {
+        if(err){
+            console.log(err);
+        } else {
+            data.post = data.post + 1;
+            data.save();
+        }
+    });
+}
+
+function subtractPost(){
+    Data.findOne({name: "data"}, function(err, data) {
+        if(err){
+            console.log(err);
+        } else {
+            data.post = data.post - 1;
+            data.save();
+        }
+    });
+}
+
+function addMessage(){
+    Data.findOne({name: "data"}, function(err, data) {
+        if(err){
+            console.log(err);
+        } else {
+            data.message = data.message + 1;
+            data.save();
+        }
+    });
+}
+
+function subtractMessage(){
+    Data.findOne({name: "data"}, function(err, data) {
+        if(err){
+            console.log(err);
+        } else {
+            data.message = data.message - 1;
+            data.save();
+        }
+    });
+}
+
+function updateEmail(){
+    Data.findOne({name: "data"}, function(err, data) {
+        if(err){
+            console.log(err);
+        } else {
+            data.email = data.email + 1;
+            data.save();
+        }
+    });
 }
 
 app.listen(process.env.PORT, process.env.IP, function(){

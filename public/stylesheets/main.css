@@ -11,6 +11,7 @@ body {
     padding-bottom: 20px;
     width: 50%;
     min-width: 300px;
+    font-family: Merriweather;
 }
 
 .background-gray {
@@ -19,6 +20,7 @@ body {
 .tocenter {
     text-align: center;
     margin-top: 5%;
+
 }
 
 .togodown {
@@ -89,4 +91,9 @@ body {
 
 .btn-width {
     width: 20%;
+}
+
+.data {
+    font-family: Yeseva One;
+    font-size: 200%;
 }
