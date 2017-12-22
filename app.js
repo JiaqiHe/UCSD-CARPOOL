@@ -171,7 +171,7 @@ app.post("/posts", isLoggedIn, function(req, res){
                     });
                 }
             });
-            
+            req.flash("success", "You have successfully created one schedule!");
             res.redirect("/posts");
         }
     });
@@ -766,9 +766,9 @@ var TIME_INTERVAL_IN_MILLIS = 60000*10; //10 minutes
 
 var reminder = function() {
     //go over notification database
-    var now = new Date().getTime() - 3600*1000;
+    var now = new Date().getTime();
     Notification.find({
-        time:{$gt: now}
+        time:{$lt: now}
     }, function(err, tosend){
         if(err){
             console.log(err);
