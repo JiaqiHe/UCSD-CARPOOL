@@ -34,6 +34,16 @@ body {
     font-family: Merriweather;
 }
 
+.helpboard {
+    background-color: rgba(240,245,230,0.78);
+    /*margin: 20px auto;*/
+    /*padding-top: 10px;*/
+    padding-bottom: 20px;
+    /*width: 50%;*/
+    min-width: 300px;
+    font-family: Questrial;
+}
+
 .background-gray {
     background: rgba(240,245,230,0.78);
 }

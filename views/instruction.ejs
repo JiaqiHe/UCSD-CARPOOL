@@ -1,0 +1,54 @@
+<% include partials/header %>
+
+<div class="container">
+    <h1 class="tocenter">What you need to know</h1>
+    <nav id="navbar-example3" class="navbar navbar-light bg-light col-md-3 float-left">
+      <nav class="nav nav-pills flex-column">
+        <a class="nav-link" href="#item-1">Authorization</a>
+        <nav class="nav nav-pills flex-column">
+          <a class="nav-link ml-3 my-1" href="#item-1-1">Posts</a>
+          <a class="nav-link ml-3 my-1" href="#item-1-2">Messages</a>
+        </nav>
+        <a class="nav-link" href="#item-2">Functionalities</a>
+        <nav class="nav nav-pills flex-column">
+          <a class="nav-link ml-3 my-1" href="#item-2-1">Notifications</a>
+          <a class="nav-link ml-3 my-1" href="#item-2-2">Password Reset</a>
+          <a class="nav-link ml-3 my-1" href="#item-2-3">Schedule Check</a>
+        </nav>
+      </nav>
+    </nav>
+    
+    <div data-target="#navbar-example3" data-offset="0" class="col-md-9 float-right helpboard">
+      <h4 id="item-1">Authorization</h4>
+      <p>You can unlock a lot of functionalities as long as you have an account! Check what you can do after you register an account!</p>
+      <h5 id="item-1-1">Posts</h5>
+      <ul>
+          <li>Have your own page displaying your history (including posts you joined and you created)</li>
+          <li>Create a new schedule</li>
+          <li>View other users' posted schedules</li>
+          <li>Edit/Delete your posted schedules only if the time you make that change is not <em>too late</em> (at least <strong>10 minutes</strong> before the set departure time)</li>
+          <li>Join/Quit others' posted schedules</li>
+      </ul>
+      <h5 id="item-1-2">Messages</h5>
+      <ul>
+          <li>Leave messages in a post</li>
+          <li>Edit/Delete your posted messages</li>
+      </ul>
+      <h4 id="item-2">Functionalities</h4>
+      <p>Apart from what is mentioned above, you can also have functionalities listing as below.</p>
+      <h5 id="item-2-1">Notifications</h5>
+      <p>For every schedule that you joined/created, you would automatically receive an e-mail notifying you this schedule as a reminder an hour before the set departure time.</p>
+      <h5 id="item-2-2">Password Reset</h5>
+      <p>You can reset your account password when you forget your password or your username.</p>
+      <h5 id="item-2-3">Schedule Check</h5>
+      <p>You would be notified when you by mistake:</p>
+      <ul>
+          <li>leave some important info boxes blank</li>
+          <li>choose a past time when creating a new schedule</li>
+      </ul>
+    </div>
+</div>
+
+
+
+<% include partials/footer %>

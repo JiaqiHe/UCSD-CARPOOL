@@ -113,6 +113,9 @@ app.get("/", function(req,res){
     res.render("landing.ejs");
 });
 
+app.get("/help", function(req, res) {
+    res.render("instruction");
+})
 //=========================
 //      POSTS
 //=========================
