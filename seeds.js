@@ -3,6 +3,7 @@ var Post = require("./models/post");
 var Message = require("./models/message");
 var User = require("./models/user");
 var Data = require("./models/data");
+var Notification = require("./models/notification");
 
 function seedDB(){
     Post.remove({}, function(err){
@@ -25,6 +26,11 @@ function seedDB(){
             console.log(err);
         }
     })
+    Notification.remove({}, function(err) {
+        if(err){
+            console.log(err);
+        }
+    });
 }
 
 module.exports = seedDB;

@@ -23,8 +23,8 @@ var Message       = require("./models/message");
 var User          = require("./models/user");
 var Data          = require("./models/data");
 var Notification  = require("./models/notification");
-// var seed          = require("./seeds.js");
-// seed();
+var seed          = require("./seeds.js");
+seed();
 
 app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({extended: true}));
@@ -241,8 +241,13 @@ app.delete("/posts/:id", checkPostOwnership, function(req, res){
                     });
                     foundUser.trips = newtrips;
                     foundUser.save();
-                    Message.remove({post: req.params.id});
-                    Notification.remove({post: req.params.id});
+                    var id = new mongoose.Types.ObjectId(req.params.id);
+                    Message.remove({post: id}, function(err){
+                        if(err) console.log(err);
+                    });
+                    Notification.remove({post: id}, function(err){
+                        if(err) console.log(err);
+                    });
                 }
             });
             res.redirect("/posts");
@@ -569,6 +574,8 @@ app.put("/posts/:id/cancel", isLoggedIn, function(req, res){
                                 email: foundUser.email, 
                                 time: updatedPost.schedule_time - 3600*1000, 
                                 post: updatedPost._id
+                            }, function(err){
+                                if(err) console.log(err);
                             });
                         }
                     });
@@ -777,7 +784,9 @@ var reminder = function() {
                             task.save();
                         }
                     })
-                    Notification.remove({hassent: true});
+                    Notification.remove({hassent: true}, function(err) {
+                        if(err) console.log(err);
+                    });
                 })
             }
         }
