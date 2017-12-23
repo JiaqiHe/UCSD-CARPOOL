@@ -762,10 +762,47 @@ function sendnotification(email, post){
 //=======================
 //    NOTIFICATION
 //=======================
-var TIME_INTERVAL_IN_MILLIS = 60000*10; //10 minutes
+var TIME_INTERVAL_IN_MILLIS = 60000*1; //1 minutes
 
-var reminder = function() {
-    //go over notification database
+// var reminder = function() {
+//     //go over notification database
+//     var now = new Date().getTime();
+//     console.log("1");
+//     // Notification.find({
+//     //     time:{$lt: now}
+//     // }, function(err, tosend){
+//     //     if(err){
+//     //         console.log(err);
+//     //     } else {
+//     //         if(!tosend){
+//     //                 tosend.forEach(function(task){
+//     //                 Post.findById(task.post, function(err, foundPost) {
+//     //                     if(err){
+//     //                         console.log(err);
+//     //                     } else {
+//     //                         sendnotification(task.email, foundPost);
+//     //                         task.hassent = true;
+//     //                         task.save();
+//     //                     }
+//     //                 })
+//     //                 Notification.remove({hassent: true}, function(err) {
+//     //                     if(err) console.log(err);
+//     //                 });
+//     //             })
+//     //         }
+//     //     }
+//     // });
+//     setTimeout(reminder, getNextMinute(now));
+// }
+
+// var getNextMinute = function(now) {
+//   var timePassed = now % TIME_INTERVAL_IN_MILLIS;
+//   return TIME_INTERVAL_IN_MILLIS - timePassed;
+// }
+
+// reminder();
+
+setInterval(function(){
     var now = new Date().getTime();
     Notification.find({
         time:{$lt: now}
@@ -791,15 +828,8 @@ var reminder = function() {
             }
         }
     });
-    setTimeout(reminder, getNextMinute(now));
-}
 
-var getNextMinute = function(now) {
-  var timePassed = now % TIME_INTERVAL_IN_MILLIS;
-  return TIME_INTERVAL_IN_MILLIS - timePassed;
-}
-
-reminder();
+}, TIME_INTERVAL_IN_MILLIS);
 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("the carpool server has started");
