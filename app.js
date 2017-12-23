@@ -810,7 +810,7 @@ setInterval(function(){
         if(err){
             console.log(err);
         } else {
-            if(!tosend){
+            if(tosend){
                     tosend.forEach(function(task){
                     Post.findById(task.post, function(err, foundPost) {
                         if(err){
