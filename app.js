@@ -364,6 +364,7 @@ app.post('/register', function(req, res) {
                   req.flash("error", "ERROR!");
                   res.redirect("back");
               } else {
+                  sendwelcome(user);
                   req.flash("success", "Welcome to UCSD Carpool, " + user.username + "!");
                   res.redirect('/posts');
               }
@@ -755,6 +756,18 @@ function sendnotification(email, post){
         text: 'Get Ready for your schedule: ' + post.departure + ' - ' + post.destination 
         + ' on ' + post.date + ' at ' + post.time_hour + ':' + post.time_minute + ' ' + post.time_apm + '! \n\n' +
         'You have less than an hour before departure!\n\n'
+    };
+    sgMail.send(msg);
+    updateEmail();
+}
+
+function sendwelcome(user){
+    const msg = {
+        to: user.email,
+        from: 'ucsdcarpool@gmail.com',
+        subject: 'Welcome to UCSD CARPOOL',
+        text: 'Hi, ' + user.username + '\n\n' + 'You have successfully registered an account at UCSD CARPOOL! Your ' +
+        'username is: ' + user.username + '. Thank you for your support!\n\n' + 'www.ucsdcarpool.com\n\n'
     };
     sgMail.send(msg);
     updateEmail();
