@@ -817,6 +817,7 @@ var TIME_INTERVAL_IN_MILLIS = 60000*1; //1 minutes
 
 setInterval(function(){
     var now = new Date().getTime();
+    // console.log("1");
     Notification.find({
         time:{$lt: now}
     }, function(err, tosend){
