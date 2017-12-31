@@ -775,7 +775,7 @@ function sendwelcome(user){
 //=======================
 //    NOTIFICATION
 //=======================
-var TIME_INTERVAL_IN_MILLIS = 60000*1; //1 minutes
+var TIME_INTERVAL_IN_MILLIS = 60000*2; //2 minutes
 
 // var reminder = function() {
 //     //go over notification database
