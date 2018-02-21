@@ -11,6 +11,7 @@ var async         = require('async');
 var crypto        = require('crypto');
 var nodemailer    = require("nodemailer");
 const sgMail      = require('@sendgrid/mail');
+var wechat        = require("wechat");
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 var url = process.env.DATABASEURL || "mongodb://localhost/carpool";
@@ -31,6 +32,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 app.use(flash());
+app.use('/weixin', require("./models/wechat"));
 
 // PASSPORT CONFIG
 app.use(require("express-session")({
@@ -775,7 +777,7 @@ function sendwelcome(user){
 //=======================
 //    NOTIFICATION
 //=======================
-var TIME_INTERVAL_IN_MILLIS = 60000*2; //2 minutes
+var TIME_INTERVAL_IN_MILLIS = 60000; //1 minutes
 
 // var reminder = function() {
 //     //go over notification database
@@ -815,7 +817,7 @@ var TIME_INTERVAL_IN_MILLIS = 60000*2; //2 minutes
 
 // reminder();
 
-setInterval(function(){
+var notif = setInterval(function(){
     var now = new Date().getTime();
     // console.log("1");
     Notification.find({
